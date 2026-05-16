@@ -79,8 +79,12 @@
 				"          nivel_atencion = upper(trim(nivel_atencion)),",
 				"          departamento = initCap(trim(departamento)),",
 				"          municipio = initCap(trim(municipio)),",
-				"          latitud = toDouble(     iif(         isNull(latitud) || trim(toString(latitud)) == '',         '0',         latitud     ) ),",
-				"          longitud = toDouble(     iif(         isNull(longitud) || trim(toString(longitud)) == '',         '0',         longitud     ) ),",
+				"          latitud = iif(\r",
+				"    isNull(latitud) || trim(toString(latitud)) == '',\r",
+				"    toDouble(0),\r",
+				"    toDouble(latitud)\r",
+				"),",
+				"          longitud = iif(     isNull(longitud) || trim(toString(longitud)) == '',     toDouble(0),     toDouble(longitud) ),",
 				"          tiene_cadena_frio = iif(     in(['si','sí','true','1','yes'], lower(trim(toString(tiene_cadena_frio)))),     true(),     false() ),",
 				"          activo = iif(     in(['si','sí','true','1','yes'], lower(trim(toString(activo)))),     true(),     false() )) ~> LimpiezaCatEstablecimientos"
 			]
