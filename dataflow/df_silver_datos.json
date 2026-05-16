@@ -110,6 +110,12 @@
 				},
 				{
 					"name": "aggregate1"
+				},
+				{
+					"name": "aggregate2"
+				},
+				{
+					"name": "aggregate3"
 				}
 			],
 			"scriptLines": [
@@ -350,7 +356,28 @@
 				"          municipio = first(municipio),",
 				"          tiene_cadena_frio = first(tiene_cadena_frio),",
 				"          activo = first(activo)) ~> aggregate1",
-				"LimpiezaCatDepart sink(allowSchemaDrift: true,",
+				"LimpiezaCatDepart aggregate(groupBy(municipio_id),",
+				"     municipio_nombre = first(municipio_nombre),",
+				"          departamento = first(departamento),",
+				"          codigo_departamento = first(codigo_departamento),",
+				"          zona_geografica = first(zona_geografica),",
+				"          es_capital_departamental = first(es_capital_departamental),",
+				"          poblacion_depto_estimada = first(poblacion_depto_estimada)) ~> aggregate2",
+				"LimpiezaVacunas aggregate(groupBy(vacuna_id),",
+				"     vacuna_nombre = first(vacuna_nombre),",
+				"          enfermedad_previene = first(enfermedad_previene),",
+				"          grupo_pai = first(grupo_pai),",
+				"          numero_dosis = first(numero_dosis),",
+				"          dosis_descripcion = first(dosis_descripcion),",
+				"          edad_aplicacion_descripcion = first(edad_aplicacion_descripcion),",
+				"          edad_minima_dias = first(edad_minima_dias),",
+				"          edad_maxima_dias = first(edad_maxima_dias),",
+				"          intervalo_minimo_dias = first(intervalo_minimo_dias),",
+				"          via_administracion = first(via_administracion),",
+				"          sitio_aplicacion = first(sitio_aplicacion),",
+				"          dosis_ml = first(dosis_ml),",
+				"          condicion_especial = first(condicion_especial)) ~> aggregate3",
+				"aggregate2 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
 				"          municipio_id as string,",
@@ -416,7 +443,7 @@
 				"          tiene_cadena_frio,",
 				"          activo",
 				"     )) ~> sink2",
-				"LimpiezaVacunas sink(allowSchemaDrift: true,",
+				"aggregate3 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
 				"          vacuna_id as string,",
