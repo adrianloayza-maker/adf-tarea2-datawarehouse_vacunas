@@ -80,11 +80,11 @@
 				"          departamento = initCap(trim(departamento)),",
 				"          municipio = initCap(trim(municipio)),",
 				"          latitud = iif(\r",
-				"    isNull(latitud) || trim(toString(latitud)) == '',\r",
-				"    toDouble(0),\r",
-				"    toDouble(latitud)\r",
+				"    isNull(latitud),\r",
+				"    toFloat(0.0),\r",
+				"    toFloat(latitud)\r",
 				"),",
-				"          longitud = iif(     isNull(longitud) || trim(toString(longitud)) == '',     toDouble(0),     toDouble(longitud) ),",
+				"          longitud = iif(     isNull(longitud),     toFloat(0.0),     toFloat(longitud) ),",
 				"          tiene_cadena_frio = iif(     in(['si','sí','true','1','yes'], lower(trim(toString(tiene_cadena_frio)))),     true(),     false() ),",
 				"          activo = iif(     in(['si','sí','true','1','yes'], lower(trim(toString(activo)))),     true(),     false() )) ~> LimpiezaCatEstablecimientos"
 			]
