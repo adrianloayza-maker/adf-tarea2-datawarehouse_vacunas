@@ -1,0 +1,89 @@
+{
+	"name": "df_silver_cat_departamentos",
+	"properties": {
+		"folder": {
+			"name": "silver"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "bronze_catalogo_departamentos",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				},
+				{
+					"dataset": {
+						"referenceName": "bronze_catalogo_establecimientos",
+						"type": "DatasetReference"
+					},
+					"name": "source2"
+				}
+			],
+			"sinks": [],
+			"transformations": [
+				{
+					"name": "LimpiezaCatDepart"
+				},
+				{
+					"name": "LimpiezaCatEstablecimientos"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          municipio_id as string,",
+				"          municipio_nombre as string,",
+				"          departamento as string,",
+				"          codigo_departamento as string,",
+				"          zona_geografica as string,",
+				"          es_capital_departamental as string,",
+				"          poblacion_depto_estimada as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'SELECT\\n    TRIM(municipio_id) AS municipio_id,\\n    TRIM(municipio_nombre) AS municipio_nombre,\\n    TRIM(departamento) AS departamento,\\n    TRIM(codigo_departamento) AS codigo_departamento,\\n    TRIM(zona_geografica) AS zona_geografica,\\n    TRIM(es_capital_departamental) AS es_capital_departamental,\\n    TRIM(poblacion_depto_estimada) AS poblacion_depto_estimada\\nFROM bronze.catalogo_departamentos\\nWHERE municipio_id IS NOT NULL\\nAND TRIM(municipio_id) <> \\'\\'',",
+				"     format: 'query') ~> source1",
+				"source(output(",
+				"          establecimiento_id as string,",
+				"          nombre_establecimiento as string,",
+				"          tipo_establecimiento as string,",
+				"          nivel_atencion as string,",
+				"          zona as string,",
+				"          sedes as string,",
+				"          red_salud as string,",
+				"          departamento as string,",
+				"          municipio as string,",
+				"          latitud as string,",
+				"          longitud as string,",
+				"          tiene_cadena_frio as string,",
+				"          activo as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'SELECT\\n    TRIM(establecimiento_id) AS establecimiento_id,\\n    TRIM(nombre_establecimiento) AS nombre_establecimiento,\\n    TRIM(tipo_establecimiento) AS tipo_establecimiento,\\n    TRIM(nivel_atencion) AS nivel_atencion,\\n    TRIM(zona) AS zona,\\n    TRIM(sedes) AS sedes,\\n    TRIM(red_salud) AS red_salud,\\n    TRIM(departamento) AS departamento,\\n    TRIM(municipio) AS municipio,\\n    TRIM(latitud) AS latitud,\\n    TRIM(longitud) AS longitud,\\n    TRIM(tiene_cadena_frio) AS tiene_cadena_frio,\\n    TRIM(activo) AS activo\\nFROM bronze.catalogo_establecimientos\\nWHERE establecimiento_id IS NOT NULL\\nAND TRIM(establecimiento_id) <> \\'\\'',",
+				"     format: 'query') ~> source2",
+				"source1 derive(municipio_nombre = initCap(trim(municipio_nombre)),",
+				"          departamento = initCap(trim(departamento)),",
+				"          es_capital_departamental = iif(\r",
+				"    in(['si','sí','true','1','yes'], lower(trim(toString(es_capital_departamental)))),\r",
+				"    true(),\r",
+				"    false()\r",
+				"),",
+				"          poblacion_depto_estimada = toInteger(poblacion_depto_estimada)) ~> LimpiezaCatDepart",
+				"source2 derive(nombre_establecimiento = initCap(regexReplace(trim(nombre_establecimiento), '\\\\s+', ' ')),",
+				"          tipo_establecimiento = upper(trim(tipo_establecimiento)),",
+				"          nivel_atencion = upper(trim(nivel_atencion)),",
+				"          departamento = initCap(trim(departamento)),",
+				"          municipio = initCap(trim(municipio)),",
+				"          latitud = toDouble(     iif(         isNull(latitud) || trim(toString(latitud)) == '',         '0',         latitud     ) ),",
+				"          longitud = toDouble(     iif(         isNull(longitud) || trim(toString(longitud)) == '',         '0',         longitud     ) ),",
+				"          tiene_cadena_frio = iif(     in(['si','sí','true','1','yes'], lower(trim(toString(tiene_cadena_frio)))),     true(),     false() ),",
+				"          activo = iif(     in(['si','sí','true','1','yes'], lower(trim(toString(activo)))),     true(),     false() )) ~> LimpiezaCatEstablecimientos"
+			]
+		}
+	}
+}
