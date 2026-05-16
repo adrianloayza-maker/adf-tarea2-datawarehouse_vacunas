@@ -1,5 +1,5 @@
 {
-	"name": "df_silver_cat_departamentos",
+	"name": "df_silver_datos",
 	"properties": {
 		"folder": {
 			"name": "silver"
@@ -20,15 +20,59 @@
 						"type": "DatasetReference"
 					},
 					"name": "source2"
+				},
+				{
+					"dataset": {
+						"referenceName": "bronze_catalogo_vacunas_pai",
+						"type": "DatasetReference"
+					},
+					"name": "source3"
+				},
+				{
+					"dataset": {
+						"referenceName": "bronze_vacunacion_la_paz",
+						"type": "DatasetReference"
+					},
+					"name": "source4"
+				},
+				{
+					"dataset": {
+						"referenceName": "bronze_vacunacion_rural_movil",
+						"type": "DatasetReference"
+					},
+					"name": "source5"
+				},
+				{
+					"dataset": {
+						"referenceName": "bronze_vacunacion_santa_cruz",
+						"type": "DatasetReference"
+					},
+					"name": "source6"
 				}
 			],
-			"sinks": [],
+			"sinks": [
+				{
+					"name": "sink1"
+				}
+			],
 			"transformations": [
 				{
 					"name": "LimpiezaCatDepart"
 				},
 				{
 					"name": "LimpiezaCatEstablecimientos"
+				},
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "derivedColumn2"
+				},
+				{
+					"name": "derivedColumn3"
+				},
+				{
+					"name": "derivedColumn4"
 				}
 			],
 			"scriptLines": [
@@ -66,6 +110,114 @@
 				"     isolationLevel: 'READ_UNCOMMITTED',",
 				"     query: 'SELECT\\n    TRIM(establecimiento_id) AS establecimiento_id,\\n    TRIM(nombre_establecimiento) AS nombre_establecimiento,\\n    TRIM(tipo_establecimiento) AS tipo_establecimiento,\\n    TRIM(nivel_atencion) AS nivel_atencion,\\n    TRIM(zona) AS zona,\\n    TRIM(sedes) AS sedes,\\n    TRIM(red_salud) AS red_salud,\\n    TRIM(departamento) AS departamento,\\n    TRIM(municipio) AS municipio,\\n    TRIM(latitud) AS latitud,\\n    TRIM(longitud) AS longitud,\\n    TRIM(tiene_cadena_frio) AS tiene_cadena_frio,\\n    TRIM(activo) AS activo\\nFROM bronze.catalogo_establecimientos\\nWHERE establecimiento_id IS NOT NULL\\nAND TRIM(establecimiento_id) <> \\'\\'',",
 				"     format: 'query') ~> source2",
+				"source(output(",
+				"          vacuna_id as string,",
+				"          vacuna_nombre as string,",
+				"          enfermedad_previene as string,",
+				"          grupo_pai as string,",
+				"          numero_dosis as string,",
+				"          dosis_descripcion as string,",
+				"          edad_aplicacion_descripcion as string,",
+				"          edad_minima_dias as string,",
+				"          edad_maxima_dias as string,",
+				"          intervalo_minimo_dias as string,",
+				"          via_administracion as string,",
+				"          sitio_aplicacion as string,",
+				"          dosis_ml as string,",
+				"          condicion_especial as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'SELECT\\n    TRIM(vacuna_id) AS vacuna_id,\\n    TRIM(vacuna_nombre) AS vacuna_nombre,\\n    TRIM(enfermedad_previene) AS enfermedad_previene,\\n    TRIM(grupo_pai) AS grupo_pai,\\n    TRIM(numero_dosis) AS numero_dosis,\\n    TRIM(dosis_descripcion) AS dosis_descripcion,\\n    TRIM(edad_aplicacion_descripcion) AS edad_aplicacion_descripcion,\\n    TRIM(edad_minima_dias) AS edad_minima_dias,\\n    TRIM(edad_maxima_dias) AS edad_maxima_dias,\\n    TRIM(intervalo_minimo_dias) AS intervalo_minimo_dias,\\n    TRIM(via_administracion) AS via_administracion,\\n    TRIM(sitio_aplicacion) AS sitio_aplicacion,\\n    TRIM(dosis_ml) AS dosis_ml,\\n    TRIM(condicion_especial) AS condicion_especial\\nFROM bronze.catalogo_vacunas_pai\\nWHERE vacuna_id IS NOT NULL\\nAND TRIM(vacuna_id) <> \\'\\'',",
+				"     format: 'query') ~> source3",
+				"source(output(",
+				"          registro_id as string,",
+				"          paciente_id as string,",
+				"          ci_paciente as string,",
+				"          nombre_paciente as string,",
+				"          apellido_paterno as string,",
+				"          apellido_materno as string,",
+				"          sexo as string,",
+				"          fecha_nacimiento as string,",
+				"          municipio_residencia as string,",
+				"          comunidad_indigena as string,",
+				"          fecha_vacunacion as string,",
+				"          vacuna_id as string,",
+				"          vacuna_nombre as string,",
+				"          numero_dosis as string,",
+				"          establecimiento_id as string,",
+				"          nombre_establecimiento as string,",
+				"          departamento as string,",
+				"          lote_vacuna as string,",
+				"          temperatura_conservacion as string,",
+				"          edad_dias_aplicacion as string,",
+				"          via_administracion as string,",
+				"          fuente_datos as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'SELECT \\n    TRIM(registro_id) AS registro_id,\\n    TRIM(paciente_id) AS paciente_id,\\n    TRIM(ci_paciente) AS ci_paciente,\\n    TRIM(nombre_paciente) AS nombre_paciente,\\n    TRIM(apellido_paterno) AS apellido_paterno,\\n    TRIM(apellido_materno) AS apellido_materno,\\n    TRIM(sexo) AS sexo,\\n    TRIM(fecha_nacimiento) AS fecha_nacimiento,\\n    TRIM(municipio_residencia) AS municipio_residencia,\\n    TRIM(comunidad_indigena) AS comunidad_indigena,\\n    TRIM(fecha_vacunacion) AS fecha_vacunacion,\\n    TRIM(vacuna_id) AS vacuna_id,\\n    TRIM(vacuna_nombre) AS vacuna_nombre,\\n    TRIM(numero_dosis) AS numero_dosis,\\n    TRIM(establecimiento_id) AS establecimiento_id,\\n    TRIM(nombre_establecimiento) AS nombre_establecimiento,\\n    TRIM(departamento) AS departamento,\\n    TRIM(lote_vacuna) AS lote_vacuna,\\n    TRIM(temperatura_conservacion) AS temperatura_conservacion,\\n    TRIM(edad_dias_aplicacion) AS edad_dias_aplicacion,\\n    TRIM(via_administracion) AS via_administracion,\\n    \\'LA_PAZ\\' AS fuente_datos\\nFROM bronze.vacunacion_la_paz\\nWHERE registro_id IS NOT NULL \\nAND TRIM(registro_id) <> \\'\\'',",
+				"     format: 'query') ~> source4",
+				"source(output(",
+				"          registro_id as string,",
+				"          paciente_id as string,",
+				"          ci_paciente as string,",
+				"          nombre_paciente as string,",
+				"          apellido_paterno as string,",
+				"          apellido_materno as string,",
+				"          sexo as string,",
+				"          fecha_nacimiento as string,",
+				"          municipio_residencia as string,",
+				"          comunidad_indigena as string,",
+				"          fecha_vacunacion as string,",
+				"          vacuna_id as string,",
+				"          vacuna_nombre as string,",
+				"          numero_dosis as string,",
+				"          establecimiento_id as string,",
+				"          nombre_establecimiento as string,",
+				"          departamento as string,",
+				"          lote_vacuna as string,",
+				"          temperatura_conservacion as string,",
+				"          edad_dias_aplicacion as string,",
+				"          via_administracion as string,",
+				"          fuente_datos as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: '\\nSELECT \\n    TRIM(registro_id) AS registro_id,\\n    TRIM(paciente_id) AS paciente_id,\\n    TRIM(ci_paciente) AS ci_paciente,\\n    TRIM(nombre_paciente) AS nombre_paciente,\\n    TRIM(apellido_paterno) AS apellido_paterno,\\n    TRIM(apellido_materno) AS apellido_materno,\\n    TRIM(sexo) AS sexo,\\n    TRIM(fecha_nacimiento) AS fecha_nacimiento,\\n    TRIM(municipio_residencia) AS municipio_residencia,\\n    TRIM(comunidad_indigena) AS comunidad_indigena,\\n    TRIM(fecha_vacunacion) AS fecha_vacunacion,\\n    TRIM(vacuna_id) AS vacuna_id,\\n    TRIM(vacuna_nombre) AS vacuna_nombre,\\n    TRIM(numero_dosis) AS numero_dosis,\\n    TRIM(establecimiento_id) AS establecimiento_id,\\n    TRIM(nombre_establecimiento) AS nombre_establecimiento,\\n    TRIM(departamento) AS departamento,\\n    TRIM(lote_vacuna) AS lote_vacuna,\\n    TRIM(temperatura_conservacion) AS temperatura_conservacion,\\n    TRIM(edad_dias_aplicacion) AS edad_dias_aplicacion,\\n    TRIM(via_administracion) AS via_administracion,\\n    \\'RURAL_MOVIL\\' AS fuente_datos\\nFROM bronze.vacunacion_rural_movil\\nWHERE registro_id IS NOT NULL \\nAND TRIM(registro_id) <> \\'\\'',",
+				"     format: 'query') ~> source5",
+				"source(output(",
+				"          registro_id as string,",
+				"          paciente_id as string,",
+				"          ci_paciente as string,",
+				"          nombre_paciente as string,",
+				"          apellido_paterno as string,",
+				"          apellido_materno as string,",
+				"          sexo as string,",
+				"          fecha_nacimiento as string,",
+				"          municipio_residencia as string,",
+				"          comunidad_indigena as string,",
+				"          fecha_vacunacion as string,",
+				"          vacuna_id as string,",
+				"          vacuna_nombre as string,",
+				"          numero_dosis as string,",
+				"          establecimiento_id as string,",
+				"          nombre_establecimiento as string,",
+				"          departamento as string,",
+				"          lote_vacuna as string,",
+				"          temperatura_conservacion as string,",
+				"          edad_dias_aplicacion as string,",
+				"          via_administracion as string,",
+				"          fuente_datos as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'SELECT \\n    TRIM(registro_id) AS registro_id,\\n    TRIM(paciente_id) AS paciente_id,\\n    TRIM(ci_paciente) AS ci_paciente,\\n    TRIM(nombre_paciente) AS nombre_paciente,\\n    TRIM(apellido_paterno) AS apellido_paterno,\\n    TRIM(apellido_materno) AS apellido_materno,\\n    TRIM(sexo) AS sexo,\\n    TRIM(fecha_nacimiento) AS fecha_nacimiento,\\n    TRIM(municipio_residencia) AS municipio_residencia,\\n    TRIM(comunidad_indigena) AS comunidad_indigena,\\n    TRIM(fecha_vacunacion) AS fecha_vacunacion,\\n    TRIM(vacuna_id) AS vacuna_id,\\n    TRIM(vacuna_nombre) AS vacuna_nombre,\\n    TRIM(numero_dosis) AS numero_dosis,\\n    TRIM(establecimiento_id) AS establecimiento_id,\\n    TRIM(nombre_establecimiento) AS nombre_establecimiento,\\n    TRIM(departamento) AS departamento,\\n    TRIM(lote_vacuna) AS lote_vacuna,\\n    TRIM(temperatura_conservacion) AS temperatura_conservacion,\\n    TRIM(edad_dias_aplicacion) AS edad_dias_aplicacion,\\n    TRIM(via_administracion) AS via_administracion,\\n    \\'SANTA_CRUZ\\' AS fuente_datos\\nFROM bronze.vacunacion_santa_cruz\\nWHERE registro_id IS NOT NULL \\nAND TRIM(registro_id) <> \\'\\'',",
+				"     format: 'query') ~> source6",
 				"source1 derive(municipio_nombre = initCap(trim(municipio_nombre)),",
 				"          departamento = initCap(trim(departamento)),",
 				"          es_capital_departamental = iif(\r",
@@ -86,7 +238,62 @@
 				"),",
 				"          longitud = iif(     isNull(longitud),     toFloat(0.0),     toFloat(longitud) ),",
 				"          tiene_cadena_frio = iif(     in(['si','sí','true','1','yes'], lower(trim(toString(tiene_cadena_frio)))),     true(),     false() ),",
-				"          activo = iif(     in(['si','sí','true','1','yes'], lower(trim(toString(activo)))),     true(),     false() )) ~> LimpiezaCatEstablecimientos"
+				"          activo = iif(     in(['si','sí','true','1','yes'], lower(trim(toString(activo)))),     true(),     false() )) ~> LimpiezaCatEstablecimientos",
+				"source3 derive(vacuna_nombre = upper(trim(vacuna_nombre)),",
+				"          enfermedad_previene = initCap(regexReplace(trim(enfermedad_previene), '\\\\s+', ' ')),",
+				"          numero_dosis = toInteger(numero_dosis),",
+				"          edad_minima_dias = toInteger(edad_minima_dias),",
+				"          edad_maxima_dias = toInteger(edad_maxima_dias),",
+				"          intervalo_minimo_dias = toInteger(intervalo_minimo_dias),",
+				"          dosis_ml = toDecimal(regexReplace(toString(dosis_ml), '[^0-9.]', '')),",
+				"          via_administracion = upper(trim(via_administracion))) ~> derivedColumn1",
+				"source4 derive(nombre_paciente = initCap(regexReplace(trim(nombre_paciente), '\\\\s+', ' ')),",
+				"          apellido_paterno = initCap(regexReplace(trim(apellido_paterno), '\\\\s+', ' ')),",
+				"          apellido_materno = initCap(regexReplace(trim(apellido_materno), '\\\\s+', ' ')),",
+				"          sexo = case(     in(['M','Masculino','masculino'], sexo), 'M',     in(['F','Femenino','femenino'], sexo), 'F',     sexo ),",
+				"          fecha_nacimiento = coalesce(      toDate(fecha_nacimiento, 'yyyy-MM-dd'),      toDate(fecha_nacimiento, 'dd/MM/yyyy'),      toDate(fecha_nacimiento, 'MM-dd-yyyy'),      toDate(fecha_nacimiento, 'yyyy/MM/dd') ),",
+				"          municipio_residencia = initCap(regexReplace(trim(municipio_residencia), '\\\\s+', ' ')),",
+				"          comunidad_indigena = iif(     in(['si','sí','true','1','yes'], lower(trim(toString(comunidad_indigena)))),     true(),     false() ),",
+				"          vacuna_nombre = upper(trim(vacuna_nombre)),",
+				"          numero_dosis = toInteger(numero_dosis),",
+				"          nombre_establecimiento = initCap(regexReplace(trim(nombre_establecimiento), '\\\\s+', ' ')),",
+				"          departamento = case(     in(['SCZ','Santa Cruz','santa cruz'], departamento), 'Santa Cruz',     in(['LPZ','La Paz','la paz'], departamento), 'La Paz',     in(['CBBA','Cochabamba'], departamento), 'Cochabamba',     upper(trim(departamento)) ),",
+				"          temperatura_conservacion = toDecimal(regexReplace(toString(temperatura_conservacion), '[^0-9.-]', '')),",
+				"          edad_dias_aplicacion = toInteger(edad_dias_aplicacion),",
+				"          via_administracion = upper(trim(via_administracion))) ~> derivedColumn2",
+				"source5 derive(nombre_paciente = initCap(regexReplace(trim(nombre_paciente), '\\\\s+', ' ')),",
+				"          apellido_paterno = initCap(regexReplace(trim(apellido_paterno), '\\\\s+', ' ')),",
+				"          apellido_materno = initCap(regexReplace(trim(apellido_materno), '\\\\s+', ' ')),",
+				"          sexo = case(     in(['M','Masculino','masculino'], sexo), 'M',     in(['F','Femenino','femenino'], sexo), 'F',     sexo ),",
+				"          fecha_nacimiento = coalesce(      toDate(fecha_nacimiento, 'yyyy-MM-dd'),      toDate(fecha_nacimiento, 'dd/MM/yyyy'),      toDate(fecha_nacimiento, 'MM-dd-yyyy'),      toDate(fecha_nacimiento, 'yyyy/MM/dd') ),",
+				"          fecha_vacunacion = coalesce(      toDate(fecha_vacunacion, 'yyyy-MM-dd'),      toDate(fecha_vacunacion, 'dd/MM/yyyy'),      toDate(fecha_vacunacion, 'MM-dd-yyyy'),      toDate(fecha_vacunacion, 'yyyy/MM/dd') ),",
+				"          municipio_residencia = initCap(regexReplace(trim(municipio_residencia), '\\\\s+', ' ')),",
+				"          comunidad_indigena = iif(     in(['si','sí','true','1','yes'], lower(trim(toString(comunidad_indigena)))),     true(),     false() ),",
+				"          vacuna_nombre = upper(trim(vacuna_nombre)),",
+				"          numero_dosis = toInteger(numero_dosis),",
+				"          nombre_establecimiento = initCap(regexReplace(trim(nombre_establecimiento), '\\\\s+', ' ')),",
+				"          departamento = case(     in(['SCZ','Santa Cruz','santa cruz'], departamento), 'Santa Cruz',     in(['LPZ','La Paz','la paz'], departamento), 'La Paz',     in(['CBBA','Cochabamba'], departamento), 'Cochabamba',     upper(trim(departamento)) ),",
+				"          temperatura_conservacion = toDecimal(regexReplace(toString(temperatura_conservacion), '[^0-9.-]', '')),",
+				"          edad_dias_aplicacion = toInteger(edad_dias_aplicacion),",
+				"          via_administracion = upper(trim(via_administracion))) ~> derivedColumn3",
+				"source6 derive(nombre_paciente = initCap(regexReplace(trim(nombre_paciente), '\\\\s+', ' ')),",
+				"          apellido_paterno = initCap(regexReplace(trim(apellido_paterno), '\\\\s+', ' ')),",
+				"          apellido_materno = initCap(regexReplace(trim(apellido_materno), '\\\\s+', ' ')),",
+				"          sexo = case(     in(['M','Masculino','masculino'], sexo), 'M',     in(['F','Femenino','femenino'], sexo), 'F',     sexo ),",
+				"          fecha_nacimiento = coalesce(      toDate(fecha_nacimiento, 'yyyy-MM-dd'),      toDate(fecha_nacimiento, 'dd/MM/yyyy'),      toDate(fecha_nacimiento, 'MM-dd-yyyy'),      toDate(fecha_nacimiento, 'yyyy/MM/dd') ),",
+				"          fecha_vacunacion = coalesce(      toDate(fecha_vacunacion, 'yyyy-MM-dd'),      toDate(fecha_vacunacion, 'dd/MM/yyyy'),      toDate(fecha_vacunacion, 'MM-dd-yyyy'),      toDate(fecha_vacunacion, 'yyyy/MM/dd') ),",
+				"          municipio_residencia = initCap(regexReplace(trim(municipio_residencia), '\\\\s+', ' ')),",
+				"          comunidad_indigena = iif(     in(['si','sí','true','1','yes'], lower(trim(toString(comunidad_indigena)))),     true(),     false() ),",
+				"          vacuna_nombre = upper(trim(vacuna_nombre)),",
+				"          numero_dosis = toInteger(numero_dosis),",
+				"          nombre_establecimiento = initCap(regexReplace(trim(nombre_establecimiento), '\\\\s+', ' ')),",
+				"          temperatura_conservacion = toDecimal(regexReplace(toString(temperatura_conservacion), '[^0-9.-]', '')),",
+				"          edad_dias_aplicacion = toInteger(edad_dias_aplicacion),",
+				"          via_administracion = upper(trim(via_administracion))) ~> derivedColumn4",
+				"LimpiezaCatDepart sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink1"
 			]
 		}
 	}
