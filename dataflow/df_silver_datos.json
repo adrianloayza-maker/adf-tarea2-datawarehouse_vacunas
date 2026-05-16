@@ -107,6 +107,9 @@
 				},
 				{
 					"name": "UnionNombres"
+				},
+				{
+					"name": "aggregate1"
 				}
 			],
 			"scriptLines": [
@@ -336,6 +339,17 @@
 				"LimpiezaVacLaPaz, LimpiezaVacRural union(byName: true)~> LAPAZunionRURAL",
 				"LAPAZunionRURAL, LimpiezaVacSantaCruz union(byName: true)~> UnionVacunaciones",
 				"UnionVacunaciones derive(nombre_completo = trim(     nombre_paciente + ' ' +     apellido_paterno + ' ' +     apellido_materno )) ~> UnionNombres",
+				"LimpiezaCatEstablecimientos aggregate(groupBy(establecimiento_id),",
+				"     nombre_establecimiento = first(nombre_establecimiento),",
+				"          tipo_establecimiento = first(tipo_establecimiento),",
+				"          nivel_atencion = first(nivel_atencion),",
+				"          zona = first(zona),",
+				"          sedes = first(sedes),",
+				"          red_salud = first(red_salud),",
+				"          departamento = first(departamento),",
+				"          municipio = first(municipio),",
+				"          tiene_cadena_frio = first(tiene_cadena_frio),",
+				"          activo = first(activo)) ~> aggregate1",
 				"LimpiezaCatDepart sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
@@ -364,7 +378,7 @@
 				"          es_capital_departamental,",
 				"          poblacion_depto_estimada",
 				"     )) ~> sink1",
-				"LimpiezaCatEstablecimientos sink(allowSchemaDrift: true,",
+				"aggregate1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
 				"          establecimiento_id as string,",
