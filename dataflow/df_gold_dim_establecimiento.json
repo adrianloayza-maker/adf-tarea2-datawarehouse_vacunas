@@ -24,7 +24,14 @@
 					"name": "sink1"
 				}
 			],
-			"transformations": [],
+			"transformations": [
+				{
+					"name": "aggregate1"
+				},
+				{
+					"name": "surrogateKey1"
+				}
+			],
 			"scriptLines": [
 				"source(output(",
 				"          establecimiento_id as string,",
@@ -46,7 +53,20 @@
 				"     isolationLevel: 'READ_UNCOMMITTED',",
 				"     query: 'SELECT DISTINCT\\n    establecimiento_id,\\n    nombre_establecimiento,\\n    tipo_establecimiento,\\n    nivel_atencion,\\n    zona,\\n    sedes,\\n    red_salud,\\n    departamento,\\n    municipio,\\n    latitud,\\n    longitud,\\n    tiene_cadena_frio,\\n    activo\\nFROM silver.establecimientos\\nWHERE establecimiento_id IS NOT NULL',",
 				"     format: 'query') ~> source1",
-				"source1 sink(allowSchemaDrift: true,",
+				"source1 aggregate(groupBy(establecimiento_id),",
+				"     nombre_establecimiento = first(nombre_establecimiento),",
+				"          tipo_establecimiento = first(tipo_establecimiento),",
+				"          nivel_atencion = first(nivel_atencion),",
+				"          zona = first(zona),",
+				"          sedes = first(sedes),",
+				"          red_salud = first(red_salud),",
+				"          departamento = first(departamento),",
+				"          municipio = first(municipio),",
+				"          tiene_cadena_frio = first(municipio)) ~> aggregate1",
+				"aggregate1 keyGenerate(output(establecimiento_key as long),",
+				"     startAt: 1L,",
+				"     stepValue: 1L) ~> surrogateKey1",
+				"surrogateKey1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
 				"          establecimiento_key as integer,",
@@ -70,6 +90,7 @@
 				"     skipDuplicateMapOutputs: true,",
 				"     errorHandlingOption: 'stopOnFirstError',",
 				"     mapColumn(",
+				"          establecimiento_key,",
 				"          establecimiento_id,",
 				"          nombre_establecimiento,",
 				"          tipo_establecimiento,",
