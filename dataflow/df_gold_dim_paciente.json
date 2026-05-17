@@ -24,7 +24,14 @@
 					"name": "sink1"
 				}
 			],
-			"transformations": [],
+			"transformations": [
+				{
+					"name": "aggregate1"
+				},
+				{
+					"name": "surrogateKey1"
+				}
+			],
 			"scriptLines": [
 				"source(output(",
 				"          paciente_id as string,",
@@ -39,7 +46,16 @@
 				"     isolationLevel: 'READ_UNCOMMITTED',",
 				"     query: 'SELECT DISTINCT\\n    paciente_id,\\n    ci_paciente,\\n    nombre_completo,\\n    sexo,\\n    municipio_residencia,\\n    comunidad_indigena\\nFROM silver.vacunacion_consolidada\\nWHERE paciente_id IS NOT NULL',",
 				"     format: 'query') ~> source1",
-				"source1 sink(allowSchemaDrift: true,",
+				"source1 aggregate(groupBy(paciente_id),",
+				"     ci_paciente = first(ci_paciente),",
+				"          nombre_completo = first(nombre_completo),",
+				"          sexo = first(sexo),",
+				"          municipio_residencia = first(municipio_residencia),",
+				"          comunidad_indigena = first(comunidad_indigena)) ~> aggregate1",
+				"aggregate1 keyGenerate(output(paciente_key as long),",
+				"     startAt: 1L,",
+				"     stepValue: 1L) ~> surrogateKey1",
+				"surrogateKey1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
 				"          paciente_key as integer,",
@@ -60,6 +76,7 @@
 				"     errorHandlingOption: 'stopOnFirstError',",
 				"     mapColumn(",
 				"          paciente_id,",
+				"          paciente_key,",
 				"          ci_paciente,",
 				"          nombre_completo,",
 				"          sexo,",
