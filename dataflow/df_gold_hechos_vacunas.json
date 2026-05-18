@@ -1,5 +1,5 @@
 {
-	"name": "df_gold_dim_paciente",
+	"name": "df_gold_hechos_vacunas",
 	"properties": {
 		"folder": {
 			"name": "gold"
@@ -13,25 +13,17 @@
 						"type": "DatasetReference"
 					},
 					"name": "source1"
-				}
-			],
-			"sinks": [
+				},
 				{
 					"dataset": {
 						"referenceName": "gold_dim_paciente",
 						"type": "DatasetReference"
 					},
-					"name": "sink1"
+					"name": "source2"
 				}
 			],
-			"transformations": [
-				{
-					"name": "aggregate1"
-				},
-				{
-					"name": "surrogateKey1"
-				}
-			],
+			"sinks": [],
+			"transformations": [],
 			"scriptLines": [
 				"source(output(",
 				"          registro_id as string,",
@@ -61,18 +53,7 @@
 				"     validateSchema: false,",
 				"     isolationLevel: 'READ_UNCOMMITTED',",
 				"     format: 'table') ~> source1",
-				"source1 aggregate(groupBy(paciente_id),",
-				"     ci_paciente = first(ci_paciente),",
-				"          nombre_completo = first(nombre_completo),",
-				"          sexo = first(sexo),",
-				"          municipio_residencia = first(municipio_residencia),",
-				"          comunidad_indigena = first(comunidad_indigena)) ~> aggregate1",
-				"aggregate1 keyGenerate(output(paciente_key as long),",
-				"     startAt: 1L,",
-				"     stepValue: 1L) ~> surrogateKey1",
-				"surrogateKey1 sink(allowSchemaDrift: true,",
-				"     validateSchema: false,",
-				"     input(",
+				"source(output(",
 				"          paciente_key as integer,",
 				"          paciente_id as string,",
 				"          ci_paciente as string,",
@@ -81,23 +62,10 @@
 				"          municipio_residencia as string,",
 				"          comunidad_indigena as boolean",
 				"     ),",
-				"     deletable:false,",
-				"     insertable:true,",
-				"     updateable:false,",
-				"     upsertable:false,",
-				"     format: 'table',",
-				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true,",
-				"     errorHandlingOption: 'stopOnFirstError',",
-				"     mapColumn(",
-				"          paciente_key,",
-				"          paciente_id,",
-				"          ci_paciente,",
-				"          nombre_completo,",
-				"          sexo,",
-				"          municipio_residencia,",
-				"          comunidad_indigena",
-				"     )) ~> sink1"
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> source2"
 			]
 		}
 	}
