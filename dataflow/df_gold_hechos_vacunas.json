@@ -12,18 +12,22 @@
 						"referenceName": "silver_vacunacion_consolidada",
 						"type": "DatasetReference"
 					},
-					"name": "source1"
+					"name": "VacunasConsolidadas"
 				},
 				{
 					"dataset": {
 						"referenceName": "gold_dim_paciente",
 						"type": "DatasetReference"
 					},
-					"name": "source2"
+					"name": "DimPaciente"
 				}
 			],
 			"sinks": [],
-			"transformations": [],
+			"transformations": [
+				{
+					"name": "lookup1"
+				}
+			],
 			"scriptLines": [
 				"source(output(",
 				"          registro_id as string,",
@@ -52,7 +56,7 @@
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     isolationLevel: 'READ_UNCOMMITTED',",
-				"     format: 'table') ~> source1",
+				"     format: 'table') ~> VacunasConsolidadas",
 				"source(output(",
 				"          paciente_key as integer,",
 				"          paciente_id as string,",
@@ -65,7 +69,11 @@
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     isolationLevel: 'READ_UNCOMMITTED',",
-				"     format: 'table') ~> source2"
+				"     format: 'table') ~> DimPaciente",
+				"VacunasConsolidadas, DimPaciente lookup(VacunasConsolidadas@paciente_id == DimPaciente@paciente_id,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup1"
 			]
 		}
 	}
