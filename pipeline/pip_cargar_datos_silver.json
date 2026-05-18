@@ -16,7 +16,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"dataflow": {
-						"referenceName": "df_silver_datos",
+						"referenceName": "df_gold_dim_paciente",
 						"type": "DataFlowReference"
 					},
 					"compute": {
