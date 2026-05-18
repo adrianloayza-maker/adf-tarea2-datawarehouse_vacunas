@@ -1,0 +1,30 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "adf-ucb-dw-vacunas-10369756"
+		},
+		"datalake_vacunas_connectionString": {
+			"value": ""
+		},
+		"dw_vacunas_password": {
+			"value": ""
+		},
+		"dw_vacunas_properties_typeProperties_server": {
+			"value": "sql-ucb-sisger-vacunas-10369756.database.windows.net"
+		},
+		"dw_vacunas_properties_typeProperties_database": {
+			"value": "dw_vacunas"
+		},
+		"dw_vacunas_properties_typeProperties_userName": {
+			"value": "adrian"
+		},
+		"containerUri": {
+			"value": ""
+		},
+		"containerSasToken": {
+			"value": ""
+		}
+	}
+}
